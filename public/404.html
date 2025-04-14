@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting...</title>
+    <script>
+      // Store the path we want to redirect to
+      const path = window.location.pathname;
+      const basePath = "/smart-engine-maintenance-system-fe";
+
+      // Remove the base path if it exists in the current path
+      const cleanPath = path.startsWith(basePath)
+        ? path.slice(basePath.length)
+        : path;
+
+      // Store the clean path
+      sessionStorage.redirect = cleanPath;
+
+      // Redirect to the index page
+      window.location.href = basePath + "/";
+    </script>
+  </head>
+  <body>
+    <p>Redirecting...</p>
+  </body>
+</html>
