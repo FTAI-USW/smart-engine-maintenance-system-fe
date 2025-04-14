@@ -48,7 +48,7 @@ const Login = () => {
     const user = users.find((u) => u.email === data.email);
     if (user) {
       login(user.id);
-      navigate("/");
+      navigate("/dashboard");
     }
   };
 
@@ -58,7 +58,7 @@ const Login = () => {
     // Auto-login for demo
     if (userId) {
       login(userId);
-      navigate("/");
+      navigate("/dashboard");
     }
   };
 

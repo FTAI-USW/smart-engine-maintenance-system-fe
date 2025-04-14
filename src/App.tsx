@@ -51,14 +51,14 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AuthProvider>
-        <BrowserRouter>
+        <BrowserRouter basename="/smart-engine-maintenance-system-fe">
           <Routes>
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
 
             {/* Protected routes */}
             <Route
-              path="/"
+              path="/dashboard"
               element={
                 <AuthGuard>
                   <Dashboard />

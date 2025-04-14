@@ -24,9 +24,9 @@ export function AppSidebar() {
   const navItems = [
     {
       name: "Dashboard",
-      href: "/",
+      href: "/dashboard",
       icon: LayoutDashboard,
-      active: location.pathname === "/",
+      active: location.pathname === "/dashboard",
       show: true,
     },
     {
