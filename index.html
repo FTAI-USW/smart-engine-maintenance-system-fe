@@ -16,8 +16,14 @@
     <script>
       // Check if we have a stored redirect path
       const redirect = sessionStorage.redirect;
+      const basePath = "/smart-engine-maintenance-system-fe";
       delete sessionStorage.redirect;
-      if (redirect && redirect != location.pathname) {
+
+      // If no redirect path and we're at the root, redirect to dashboard
+      if (!redirect && window.location.pathname === `${basePath}/`) {
+        history.replaceState(null, null, `${basePath}/dashboard`);
+      } else if (redirect && redirect !== location.pathname) {
+        // Use replaceState to update the URL without reloading
         history.replaceState(null, null, redirect);
       }
     </script>

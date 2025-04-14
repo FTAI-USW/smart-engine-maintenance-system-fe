@@ -8,13 +8,11 @@
       const path = window.location.pathname;
       const basePath = "/smart-engine-maintenance-system-fe";
 
-      // Remove the base path if it exists in the current path
-      const cleanPath = path.startsWith(basePath)
-        ? path.slice(basePath.length)
-        : path;
+      // If the path doesn't start with the base path, add it
+      const fullPath = path.startsWith(basePath) ? path : basePath + path;
 
-      // Store the clean path
-      sessionStorage.redirect = cleanPath;
+      // Store the full path
+      sessionStorage.redirect = fullPath;
 
       // Redirect to the index page
       window.location.href = basePath + "/";
