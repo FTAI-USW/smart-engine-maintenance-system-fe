@@ -51,13 +51,6 @@ export function AppSidebar() {
       show: true,
     },
     {
-      name: "Users",
-      href: "/users",
-      icon: Users,
-      active: location.pathname === "/users",
-      show: isAdmin || isSupervisor,
-    },
-    {
       name: "Time Tracking",
       href: "/time-tracking",
       icon: Clock,
@@ -77,6 +70,13 @@ export function AppSidebar() {
       icon: Bell,
       active: location.pathname === "/notifications",
       show: true,
+    },
+    {
+      name: "Users",
+      href: "/users",
+      icon: Users,
+      active: location.pathname === "/users",
+      show: isAdmin,
     },
     // {
     //   name: "Settings",
