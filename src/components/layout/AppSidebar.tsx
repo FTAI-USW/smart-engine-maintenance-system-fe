@@ -10,6 +10,7 @@ import {
   Gauge,
   Bell,
   SlidersHorizontal,
+  Calendar,
 } from "lucide-react";
 
 export function AppSidebar() {
@@ -42,6 +43,13 @@ export function AppSidebar() {
       icon: ClipboardList,
       active: location.pathname === "/my-tasks",
       show: true,
+    },
+    {
+      name: "Daily Plan",
+      href: "/daily-plan",
+      icon: Calendar,
+      active: location.pathname === "/daily-plan",
+      show: isSupervisor,
     },
     {
       name: "Filter & Controls",
@@ -88,8 +96,8 @@ export function AppSidebar() {
   ];
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="p-4 border-b border-sidebar-border flex items-center justify-center">
+    <div className="flex flex-col h-full bg-brand-navy text-white">
+      <div className="p-4 border-b border-brand-blue flex items-center justify-center">
         <h2 className="text-xl font-bold text-white">
           Smart Engine Maintenance System
         </h2>
@@ -107,8 +115,8 @@ export function AppSidebar() {
             />
           </div>
           <div>
-            <p className="text-sm font-medium">{currentUser.name}</p>
-            <p className="text-xs text-sidebar-foreground/70 capitalize">
+            <p className="text-sm font-medium text-white">{currentUser.name}</p>
+            <p className="text-xs text-white/70 capitalize">
               {currentUser.role}
             </p>
           </div>
@@ -122,10 +130,10 @@ export function AppSidebar() {
                 key={item.name}
                 to={item.href}
                 className={cn(
-                  "flex items-center px-3 py-2 text-sm rounded-md transition-colors group",
+                  "flex items-center px-3 py-2 text-sm rounded-md transition-colors group font-medium",
                   item.active
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                    ? "bg-brand-orange text-white"
+                    : "text-white hover:bg-white hover:text-brand-orange"
                 )}
               >
                 <item.icon className="mr-2 h-4 w-4" />

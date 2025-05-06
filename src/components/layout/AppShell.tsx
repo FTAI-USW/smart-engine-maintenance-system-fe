@@ -90,18 +90,20 @@ export function AppShell({ children }: AppShellProps) {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-h-screen">
         {/* Header */}
-        <header className="h-16 border-b border-border bg-background flex items-center justify-between px-4 lg:px-6">
+        <header className="h-16 border-b border-brand-blue bg-brand-navy flex items-center justify-between px-4 lg:px-6">
           <div className="flex items-center">
             <Button
               id="sidebar-toggle"
               variant="ghost"
               size="icon"
               onClick={toggleSidebar}
-              className="lg:hidden mr-2"
+              className="lg:hidden mr-2 text-white"
             >
               {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
             </Button>
-            <h1 className="text-xl font-bold">Engine Task Manager</h1>
+            <h1 className="text-xl font-bold text-white">
+              Engine Task Manager
+            </h1>
           </div>
 
           <div className="flex items-center space-x-4">
@@ -110,7 +112,7 @@ export function AppShell({ children }: AppShellProps) {
                 variant="ghost"
                 size="icon"
                 onClick={toggleNotifications}
-                className="relative"
+                className="relative text-white"
               >
                 <Bell size={20} />
                 {unreadCount > 0 && (
@@ -126,7 +128,9 @@ export function AppShell({ children }: AppShellProps) {
                 </div>
               )}
             </div>
-            <UserNav />
+            <div className="text-white">
+              <UserNav />
+            </div>
           </div>
         </header>
 

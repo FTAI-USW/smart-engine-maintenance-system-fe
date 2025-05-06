@@ -23,6 +23,7 @@ import Maintenance from "./pages/Maintenance";
 import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 import FilterControls from "./pages/FilterControls";
+import DailyPlan from "./pages/DailyPlan";
 
 // Create query client
 const queryClient = new QueryClient();
@@ -126,6 +127,14 @@ const App = () => (
               element={
                 <AuthGuard>
                   <Notifications />
+                </AuthGuard>
+              }
+            />
+            <Route
+              path="/daily-plan"
+              element={
+                <AuthGuard>
+                  <DailyPlan />
                 </AuthGuard>
               }
             />
