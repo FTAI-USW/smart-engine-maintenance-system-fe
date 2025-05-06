@@ -48,7 +48,9 @@ export function AppSidebar() {
       name: "Daily Plan",
       href: "/daily-plan",
       icon: Calendar,
-      active: location.pathname === "/daily-plan",
+      active:
+        location.pathname.startsWith("/daily-plan") ||
+        location.pathname.startsWith("/work-order"),
       show: isSupervisor,
     },
     {
@@ -126,19 +128,29 @@ export function AppSidebar() {
           {navItems
             .filter((item) => item.show)
             .map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={cn(
-                  "flex items-center px-3 py-2 text-sm rounded-md transition-colors group font-medium",
-                  item.active
-                    ? "bg-brand-orange text-white"
-                    : "text-white hover:bg-white hover:text-brand-orange"
-                )}
-              >
-                <item.icon className="mr-2 h-4 w-4" />
-                {item.name}
-              </Link>
+              <div key={item.name}>
+                <Link
+                  to={item.href}
+                  className={cn(
+                    "flex items-center px-3 py-2 text-sm rounded-md transition-colors group font-medium",
+                    item.active
+                      ? "bg-brand-orange text-white"
+                      : "text-white hover:bg-white hover:text-brand-orange"
+                  )}
+                >
+                  <item.icon className="mr-2 h-4 w-4" />
+                  {item.name}
+                </Link>
+                {/* Breadcrumb for work order subpage, directly after Daily Plan */}
+                {item.name === "Daily Plan" &&
+                  location.pathname.startsWith("/work-order") && (
+                    <div className="ml-8 mt-1 text-xs text-white font-semibold flex items-center gap-1">
+                      <span>Daily Plan</span>
+                      <span className="mx-1">&gt;</span>
+                      <span>Work Order</span>
+                    </div>
+                  )}
+              </div>
             ))}
         </nav>
       </div>

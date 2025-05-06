@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -83,6 +84,7 @@ function getAssignee(task) {
 }
 
 const DailyPlan = () => {
+  const navigate = useNavigate();
   const [sortBy, setSortBy] = useState("priority");
   const [sortOrder, setSortOrder] = useState("asc");
   const [modalTask, setModalTask] = useState(null);
@@ -108,6 +110,10 @@ const DailyPlan = () => {
       setSortBy(key);
       setSortOrder("asc");
     }
+  };
+
+  const handleRowClick = (task) => {
+    navigate(`/work-order/${task.work_order}`);
   };
 
   return (
@@ -154,7 +160,7 @@ const DailyPlan = () => {
                   <TableRow
                     key={idx}
                     className="hover:bg-brand-blue/10 cursor-pointer transition-colors border-b border-brand-blue"
-                    onClick={() => setModalTask(task)}
+                    onClick={() => handleRowClick(task)}
                   >
                     <TableCell>{task.priority}</TableCell>
                     <TableCell>{task.work_order}</TableCell>

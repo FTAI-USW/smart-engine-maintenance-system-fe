@@ -24,6 +24,7 @@ import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 import FilterControls from "./pages/FilterControls";
 import DailyPlan from "./pages/DailyPlan";
+import WorkOrder from "./work-order/WorkOrder";
 
 // Create query client
 const queryClient = new QueryClient();
@@ -135,6 +136,14 @@ const App = () => (
               element={
                 <AuthGuard>
                   <DailyPlan />
+                </AuthGuard>
+              }
+            />
+            <Route
+              path="/work-order/:workOrderId"
+              element={
+                <AuthGuard>
+                  <WorkOrder />
                 </AuthGuard>
               }
             />
