@@ -1,12 +1,12 @@
 # Contribution Guide
 
-## Example:
+## Example
 
-```
+```none
 [type](scope): [subject]
 ```
 
-```
+```none
 feat (register-company) : implement form
 ```
 

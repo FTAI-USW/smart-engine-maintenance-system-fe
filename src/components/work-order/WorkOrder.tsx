@@ -28,15 +28,15 @@ const WorkOrder = () => {
         <div
           style={{
             width: "100%",
-            minHeight: "60vh",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            flexGrow: 1,
+            height: "100%",
             overflowX: "auto",
-            padding: "2rem 2rem",
-            background: "#f8fafc",
-            borderRadius: "1rem",
-            boxShadow: "0 2px 16px 0 rgba(0,0,0,0.08)",
           }}
         >
-          <Timeline />
+          <Timeline maxHeight="100%" />
         </div>
       </div>
     </AppShell>

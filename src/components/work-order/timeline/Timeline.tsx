@@ -38,7 +38,8 @@ const barThickness = perTechnicianHeight * 0.5; // 50% of lane height
 // Extract unique technician names
 const technicianNames = Array.from(new Set(tasks.map((task) => task.name)));
 
-const Timeline = () => {
+// Accept maxHeight as a prop
+const Timeline = ({ maxHeight }: { maxHeight?: string | number }) => {
   const [selectedTech, setSelectedTech] = useState<string>("All");
 
   // Filter tasks based on selected technician
@@ -63,6 +64,22 @@ const Timeline = () => {
   );
   const maxEnd = Math.max(
     ...filteredTasks.map((task) => new Date(task.end).getTime())
+  );
+
+  // Calculate the desired height
+  let maxH =
+    typeof maxHeight === "string" && maxHeight.endsWith("%")
+      ? (window.innerHeight * parseInt(maxHeight)) / 100
+      : typeof maxHeight === "string"
+      ? parseInt(maxHeight)
+      : typeof maxHeight === "number"
+      ? maxHeight
+      : window.innerHeight;
+  if (!maxH || isNaN(maxH)) maxH = window.innerHeight;
+  const timelineHeight = Math.min(
+    Math.max(250, filteredTasks.length * perTechnicianHeight),
+    maxH,
+    700 // Optional: set a hard max for aesthetics
   );
 
   const layout = {
@@ -100,7 +117,7 @@ const Timeline = () => {
       constrain: "range",
       range: [-0.5, filteredTasks.length - 0.5],
     },
-    height: Math.max(250, filteredTasks.length * perTechnicianHeight),
+    height: timelineHeight,
     margin: {
       l: 120,
       r: 40,
