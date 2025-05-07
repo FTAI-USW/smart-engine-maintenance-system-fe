@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
 import { ChevronRight } from "lucide-react";
-import Timeline from "@/work-order/timeline/Timeline";
+import Timeline from "@/components/work-order/timeline/Timeline";
 
 const WorkOrder = () => {
   const { workOrderId } = useParams<{ workOrderId: string }>();
@@ -25,10 +25,18 @@ const WorkOrder = () => {
           </h2>
           <p className="text-muted-foreground">Work in progress</p>
         </div>
-        <div className="flex justify-center">
-          <div className="w-full max-w-5xl">
-            <Timeline />
-          </div>
+        <div
+          style={{
+            width: "100%",
+            minHeight: "60vh",
+            overflowX: "auto",
+            padding: "2rem 2rem",
+            background: "#f8fafc",
+            borderRadius: "1rem",
+            boxShadow: "0 2px 16px 0 rgba(0,0,0,0.08)",
+          }}
+        >
+          <Timeline />
         </div>
       </div>
     </AppShell>
