@@ -24,6 +24,8 @@ const dailyTasksData = [
     goal: "CERT BY 1-MAY",
     hours_clocked: 16.4,
     next_sequence: 1250,
+    off_esn: "ESN12345",
+    for_esn: "ESN67890",
   },
   {
     priority: 5,
@@ -37,6 +39,8 @@ const dailyTasksData = [
     goal: "CERT BY 1-MAY",
     hours_clocked: 16.4,
     next_sequence: 1250,
+    off_esn: "ESN12345",
+    for_esn: "ESN67890",
   },
   {
     priority: 10,
@@ -50,6 +54,8 @@ const dailyTasksData = [
     goal: "CERT BY 1-MAY",
     hours_clocked: 16.4,
     next_sequence: 1250,
+    off_esn: "ESN54321",
+    for_esn: "ESN09876",
   },
   {
     priority: 10,
@@ -63,12 +69,15 @@ const dailyTasksData = [
     goal: "CERT BY 1-MAY",
     hours_clocked: 16.4,
     next_sequence: 1250,
+    off_esn: "ESN54321",
+    for_esn: "ESN09876",
   },
 ];
 
 const columns = [
   { key: "priority", label: "Priority" },
   { key: "work_order", label: "Work Order" },
+  { key: "esn", label: "Engine (OFF_ESN → FOR_ESN)" },
   { key: "description", label: "Description" },
   { key: "task", label: "Task" },
   { key: "assignee", label: "Assignee" },
@@ -83,7 +92,7 @@ function getAssignee(task) {
   return [task.assigned, task.assigned_2].filter(Boolean).join(", ");
 }
 
-const DailyPlan = () => {
+const MyOrders = () => {
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState("priority");
   const [sortOrder, setSortOrder] = useState("asc");
@@ -113,14 +122,18 @@ const DailyPlan = () => {
   };
 
   const handleRowClick = (task) => {
-    navigate(`/work-order/${task.work_order}`);
+    navigate(`/work-order/${task.work_order}`, {
+      state: {
+        assignees: [task.assigned, task.assigned_2].filter(Boolean),
+      },
+    });
   };
 
   return (
     <AppShell>
       <div className="space-y-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Daily Plan</h2>
+          <h2 className="text-3xl font-bold tracking-tight">My Orders</h2>
           <p className="text-muted-foreground">Work in progress</p>
           <p className="text-xs text-muted-foreground mt-1">
             Last updated: {lastUpdated}
@@ -128,7 +141,7 @@ const DailyPlan = () => {
         </div>
         <Card>
           <CardHeader>
-            <CardTitle>Daily Plan Table</CardTitle>
+            <CardTitle>Orders</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
@@ -164,6 +177,32 @@ const DailyPlan = () => {
                   >
                     <TableCell>{task.priority}</TableCell>
                     <TableCell>{task.work_order}</TableCell>
+                    <TableCell>
+                      {task.off_esn && (
+                        <span
+                          className="text-blue-600 underline cursor-pointer hover:text-blue-800"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/engine/${task.off_esn}`);
+                          }}
+                        >
+                          {task.off_esn}
+                        </span>
+                      )}
+                      {task.off_esn && task.for_esn && <span> → </span>}
+                      {task.for_esn && (
+                        <span
+                          className="text-blue-600 underline cursor-pointer hover:text-blue-800"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/engine/${task.for_esn}`);
+                          }}
+                        >
+                          {task.for_esn}
+                        </span>
+                      )}
+                      {!(task.off_esn || task.for_esn) && "-"}
+                    </TableCell>
                     <TableCell>{task.description}</TableCell>
                     <TableCell>{task.task}</TableCell>
                     <TableCell>{getAssignee(task)}</TableCell>
@@ -207,4 +246,4 @@ const DailyPlan = () => {
   );
 };
 
-export default DailyPlan;
+export default MyOrders;

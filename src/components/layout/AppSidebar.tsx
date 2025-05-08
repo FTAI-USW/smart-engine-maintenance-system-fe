@@ -45,7 +45,7 @@ export function AppSidebar() {
       show: true,
     },
     {
-      name: "Daily Plan",
+      name: "My Orders",
       href: "/daily-plan",
       icon: Calendar,
       active:
@@ -142,10 +142,10 @@ export function AppSidebar() {
                   {item.name}
                 </Link>
                 {/* Breadcrumb for work order subpage, directly after Daily Plan */}
-                {item.name === "Daily Plan" &&
+                {item.name === "My Orders" &&
                   location.pathname.startsWith("/work-order") && (
                     <div className="ml-8 mt-1 text-xs text-white font-semibold flex items-center gap-1">
-                      <span>Daily Plan</span>
+                      <span>My Orders</span>
                       <span className="mx-1">&gt;</span>
                       <span>Work Order</span>
                     </div>

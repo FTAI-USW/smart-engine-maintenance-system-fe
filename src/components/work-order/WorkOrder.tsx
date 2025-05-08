@@ -1,10 +1,20 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
 import { ChevronRight } from "lucide-react";
 import Timeline from "@/components/work-order/timeline/Timeline";
+import TimelineSidePanel from "./timeline/TimelineSidePanel";
+import type { Task } from "./timeline/TimelineSidePanel";
+import { useState } from "react";
+
+const HEADER_OFFSET = 180;
 
 const WorkOrder = () => {
   const { workOrderId } = useParams<{ workOrderId: string }>();
+  const location = useLocation();
+  const assignees = location.state?.assignees || [];
+  const availableHeight = window.innerHeight - HEADER_OFFSET;
+  const [sidePanelTech, setSidePanelTech] = useState<string | null>(null);
+  const [allTasks, setAllTasks] = useState<Task[]>([]);
 
   return (
     <AppShell>
@@ -28,16 +38,24 @@ const WorkOrder = () => {
         <div
           style={{
             width: "100%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            flexGrow: 1,
-            height: "100%",
-            overflowX: "auto",
           }}
         >
-          <Timeline maxHeight="100%" />
+          <Timeline
+            maxHeight="50%"
+            workOrderId={workOrderId || ""}
+            onBarClick={setSidePanelTech}
+            setAllTasks={setAllTasks}
+            assignees={assignees}
+          />
         </div>
+        {sidePanelTech && (
+          <TimelineSidePanel
+            technicianName={sidePanelTech}
+            tasks={allTasks.filter((t) => t.name === sidePanelTech)}
+            workOrderId={workOrderId || ""}
+            onClose={() => setSidePanelTech(null)}
+          />
+        )}
       </div>
     </AppShell>
   );
