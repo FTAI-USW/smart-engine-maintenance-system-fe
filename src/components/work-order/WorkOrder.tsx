@@ -22,10 +22,10 @@ const WorkOrder = () => {
         <div>
           <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-2">
             <Link
-              to="/daily-plan"
+              to="/my-orders"
               className="hover:text-primary transition-colors"
             >
-              Daily Plan
+              My Orders
             </Link>
             <ChevronRight className="h-4 w-4" />
             <span className="text-foreground">Work Order {workOrderId}</span>

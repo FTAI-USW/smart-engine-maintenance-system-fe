@@ -23,7 +23,7 @@ import Maintenance from "./pages/Maintenance";
 import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 import FilterControls from "./pages/FilterControls";
-import DailyPlan from "./pages/DailyPlan";
+import MyOrders from "./pages/MyOrders";
 import WorkOrder from "@/components/work-order/WorkOrder";
 
 // Create query client
@@ -132,10 +132,10 @@ const App = () => (
               }
             />
             <Route
-              path="/daily-plan"
+              path="/my-orders"
               element={
                 <AuthGuard>
-                  <DailyPlan />
+                  <MyOrders />
                 </AuthGuard>
               }
             />

@@ -46,10 +46,10 @@ export function AppSidebar() {
     },
     {
       name: "My Orders",
-      href: "/daily-plan",
+      href: "/my-orders",
       icon: Calendar,
       active:
-        location.pathname.startsWith("/daily-plan") ||
+        location.pathname.startsWith("/my-orders") ||
         location.pathname.startsWith("/work-order"),
       show: isSupervisor,
     },
