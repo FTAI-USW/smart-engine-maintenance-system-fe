@@ -5,6 +5,7 @@ import Timeline from "@/components/work-order/timeline/Timeline";
 import TimelineSidePanel from "./timeline/TimelineSidePanel";
 import type { Task } from "./timeline/TimelineSidePanel";
 import { useState } from "react";
+import EngineStatusVisual from "./EngineStatusVisual";
 
 const HEADER_OFFSET = 180;
 
@@ -30,32 +31,39 @@ const WorkOrder = () => {
             <ChevronRight className="h-4 w-4" />
             <span className="text-foreground">Work Order {workOrderId}</span>
           </div>
-          <h2 className="text-3xl font-bold tracking-tight">
-            Work Order {workOrderId}
-          </h2>
+          <div className="flex items-center gap-4">
+            <h2 className="text-3xl font-bold tracking-tight">
+              Work Order {workOrderId}
+            </h2>
+            <EngineStatusVisual status="good" />
+          </div>
           <p className="text-muted-foreground">Work in progress</p>
         </div>
-        <div
-          style={{
-            width: "100%",
-          }}
-        >
-          <Timeline
-            maxHeight="50%"
-            workOrderId={workOrderId || ""}
-            onBarClick={setSidePanelTech}
-            setAllTasks={setAllTasks}
-            assignees={assignees}
-          />
+        <div className="flex items-start gap-8 w-full">
+          <div className="flex-1">
+            <div
+              style={{
+                width: "100%",
+              }}
+            >
+              <Timeline
+                maxHeight="50%"
+                workOrderId={workOrderId || ""}
+                onBarClick={setSidePanelTech}
+                setAllTasks={setAllTasks}
+                assignees={assignees}
+              />
+            </div>
+            {sidePanelTech && (
+              <TimelineSidePanel
+                technicianName={sidePanelTech}
+                tasks={allTasks.filter((t) => t.name === sidePanelTech)}
+                workOrderId={workOrderId || ""}
+                onClose={() => setSidePanelTech(null)}
+              />
+            )}
+          </div>
         </div>
-        {sidePanelTech && (
-          <TimelineSidePanel
-            technicianName={sidePanelTech}
-            tasks={allTasks.filter((t) => t.name === sidePanelTech)}
-            workOrderId={workOrderId || ""}
-            onClose={() => setSidePanelTech(null)}
-          />
-        )}
       </div>
     </AppShell>
   );

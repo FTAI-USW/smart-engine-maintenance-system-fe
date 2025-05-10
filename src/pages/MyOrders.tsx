@@ -205,7 +205,25 @@ const MyOrders = () => {
                     </TableCell>
                     <TableCell>{task.description}</TableCell>
                     <TableCell>{task.task}</TableCell>
-                    <TableCell>{getAssignee(task)}</TableCell>
+                    <TableCell>
+                      {getAssignee(task)
+                        .split(", ")
+                        .map((name, idx, arr) => (
+                          <span
+                            key={name}
+                            className="text-blue-600 underline cursor-pointer hover:text-blue-800"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(
+                                `/technician/${encodeURIComponent(name)}`
+                              );
+                            }}
+                          >
+                            {name}
+                            {idx < arr.length - 1 ? ", " : ""}
+                          </span>
+                        ))}
+                    </TableCell>
                     <TableCell>{task.supervisor_notes}</TableCell>
                     <TableCell>{task.work_center}</TableCell>
                     <TableCell>{task.goal}</TableCell>
