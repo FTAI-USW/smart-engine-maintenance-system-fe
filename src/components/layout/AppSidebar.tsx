@@ -11,6 +11,7 @@ import {
   Bell,
   SlidersHorizontal,
   Calendar,
+  AlertTriangle,
 } from "lucide-react";
 
 export function AppSidebar() {
@@ -51,6 +52,13 @@ export function AppSidebar() {
       active:
         location.pathname.startsWith("/my-orders") ||
         location.pathname.startsWith("/work-order"),
+      show: isSupervisor,
+    },
+    {
+      name: "Snags",
+      href: "/snags",
+      icon: AlertTriangle,
+      active: location.pathname === "/snags",
       show: isSupervisor,
     },
     {
