@@ -14,5 +14,5 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  base: "/smart-engine-maintenance-system-fe/",
+  base: "/",
 }));

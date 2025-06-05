@@ -3,30 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Smart Engine Maintenance System</title>
-    <meta name="description" content="Smart Engine Maintenance System" />
+    <title>Montreal Workshop</title>
+    <meta name="description" content="Montreal Workshop" />
     <meta name="author" content="Sahan" />
 
-    <meta property="og:title" content="Smart Engine Maintenance System" />
-    <meta property="og:description" content="Smart Engine Maintenance System" />
+    <meta property="og:title" content="Montreal Workshop" />
+    <meta property="og:description" content="Montreal Workshop" />
     <meta property="og:type" content="website" />
 
     <meta name="twitter:card" content="summary_large_image" />
-
-    <script>
-      // Check if we have a stored redirect path
-      const redirect = sessionStorage.redirect;
-      const basePath = "/smart-engine-maintenance-system-fe";
-      delete sessionStorage.redirect;
-
-      // If no redirect path and we're at the root, redirect to dashboard
-      if (!redirect && window.location.pathname === `${basePath}/`) {
-        history.replaceState(null, null, `${basePath}/dashboard`);
-      } else if (redirect && redirect !== location.pathname) {
-        // Use replaceState to update the URL without reloading
-        history.replaceState(null, null, redirect);
-      }
-    </script>
   </head>
 
   <body>

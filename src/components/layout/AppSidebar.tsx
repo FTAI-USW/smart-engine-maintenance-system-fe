@@ -101,7 +101,7 @@ export function AppSidebar() {
     <div className="flex flex-col h-full bg-brand-navy text-white">
       <div className="p-4 border-b border-brand-blue flex items-center justify-center">
         <h2 className="text-xl font-bold text-white">
-          Smart Engine Maintenance System
+          Montreal Workshop
         </h2>
       </div>
 

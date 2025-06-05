@@ -53,7 +53,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AuthProvider>
-        <BrowserRouter basename="/smart-engine-maintenance-system-fe">
+        <BrowserRouter>
           <Routes>
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
