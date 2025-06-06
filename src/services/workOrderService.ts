@@ -1,3 +1,5 @@
+import { asyncApiHandler } from '../utils/asyncApiHandler';
+
 export interface WorkOrder {
   workOrderId: string;
   workOrder: string;
@@ -49,8 +51,6 @@ export interface WorkOrderFilters {
   pageSize?: number;
 }
 
-const API_BASE_URL = "http://172.18.16.15:3000";
-
 export async function fetchWorkOrders(
   filters: WorkOrderFilters = {}
 ): Promise<WorkOrderResponse> {
@@ -61,25 +61,13 @@ export async function fetchWorkOrders(
     ...otherFilters,
   });
 
-  const response = await fetch(
-    `${API_BASE_URL}/work-order-details?${queryParams}`
-  );
-  if (!response.ok) {
-    throw new Error("Failed to fetch work orders");
-  }
-  return await response.json();
+  return asyncApiHandler<WorkOrderResponse>(`/work-order-details?${queryParams}`);
 }
 
 export async function fetchWorkOrderById(
   workOrderId: string
 ): Promise<WorkOrder | null> {
-  const response = await fetch(
-    `${API_BASE_URL}/work-order-details/${workOrderId}`
-  );
-  if (!response.ok) {
-    throw new Error("Failed to fetch work order");
-  }
-  return await response.json();
+  return asyncApiHandler<WorkOrder | null>(`/work-order-details/${workOrderId}`);
 }
 
 export async function fetchWorkOrdersByEngine(
@@ -91,11 +79,5 @@ export async function fetchWorkOrdersByEngine(
     includeCompleted: includeCompleted.toString(),
   });
 
-  const response = await fetch(
-    `${API_BASE_URL}/work-order-details?${queryParams}`
-  );
-  if (!response.ok) {
-    throw new Error("Failed to fetch work orders by engine");
-  }
-  return await response.json();
+  return asyncApiHandler<WorkOrder[]>(`/work-order-details?${queryParams}`);
 }
