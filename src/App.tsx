@@ -25,6 +25,7 @@ import NotFound from "./pages/NotFound";
 import FilterControls from "./pages/FilterControls";
 import MyOrders from "./pages/MyOrders";
 import WorkOrder from "@/components/work-order/WorkOrder";
+import Snags from "./components/Snags";
 
 // Create query client
 const queryClient = new QueryClient();
@@ -136,6 +137,14 @@ const App = () => (
               element={
                 <AuthGuard>
                   <MyOrders />
+                </AuthGuard>
+              }
+            />
+            <Route
+              path="/snags"
+              element={
+                <AuthGuard>
+                  <Snags />
                 </AuthGuard>
               }
             />

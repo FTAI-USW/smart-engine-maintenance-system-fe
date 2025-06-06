@@ -1,4 +1,4 @@
-# Smart Engine Maintenance System Frontend
+# Montreal Workshop
 
 A modern web application for managing and monitoring engine maintenance operations. This frontend application provides an intuitive interface for tracking maintenance schedules, analyzing engine performance, and managing maintenance tasks.
 
