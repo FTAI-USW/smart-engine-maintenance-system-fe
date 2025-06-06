@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,109 +10,66 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-const dailyTasksData = [
-  {
-    priority: 1,
-    work_order: "WEN101201-2",
-    description: "CORE MAJOR MODULE",
-    task: "DISSASSEMBLE AS REQUIRE",
-    assigned: "Tomas",
-    assigned_2: "Sahan",
-    supervisor_notes: "Certified and sent to final",
-    work_center: "56-30-STP",
-    goal: "CERT BY 1-MAY",
-    hours_clocked: 16.4,
-    next_sequence: 1250,
-    off_esn: "ESN12345",
-    for_esn: "ESN67890",
-  },
-  {
-    priority: 5,
-    work_order: "WEN101201-2",
-    description: "CORE MAJOR MODULE",
-    task: "DISSASSEMBLE AS REQUIRE",
-    assigned: "Tomas",
-    assigned_2: "Sahan",
-    supervisor_notes: "Certified and sent to final",
-    work_center: "56-30-STP",
-    goal: "CERT BY 1-MAY",
-    hours_clocked: 16.4,
-    next_sequence: 1250,
-    off_esn: "ESN12345",
-    for_esn: "ESN67890",
-  },
-  {
-    priority: 10,
-    work_order: "WEN101201-2",
-    description: "COMPRESSOR ROTOR ASSEMBLY",
-    task: "DISSASSEMBLE AS REQUIRE",
-    assigned: "David",
-    assigned_2: "Mabrouka",
-    supervisor_notes: "Certified and sent to final",
-    work_center: "56-30-STP",
-    goal: "CERT BY 1-MAY",
-    hours_clocked: 16.4,
-    next_sequence: 1250,
-    off_esn: "ESN54321",
-    for_esn: "ESN09876",
-  },
-  {
-    priority: 10,
-    work_order: "WEN101201-2-8",
-    description: "CORE MAJOR MODULE",
-    task: "DISSASSEMBLE AS REQUIRE",
-    assigned: "David",
-    assigned_2: "Mabrouka",
-    supervisor_notes: "Certified and sent to final",
-    work_center: "56-30-STP",
-    goal: "CERT BY 1-MAY",
-    hours_clocked: 16.4,
-    next_sequence: 1250,
-    off_esn: "ESN54321",
-    for_esn: "ESN09876",
-  },
-];
+import { fetchWorkOrders, WorkOrder } from "@/services/workOrderService";
 
 const columns = [
-  { key: "priority", label: "Priority" },
-  { key: "work_order", label: "Work Order" },
-  { key: "esn", label: "Engine (OFF_ESN → FOR_ESN)" },
-  { key: "description", label: "Description" },
-  { key: "task", label: "Task" },
-  { key: "assignee", label: "Assignee" },
-  { key: "supervisor_notes", label: "Supervisor Notes" },
-  { key: "work_center", label: "Work Center" },
-  { key: "goal", label: "Goal" },
-  { key: "hours_clocked", label: "Hours Clocked" },
-  { key: "next_sequence", label: "Next Sequence" },
+  { key: "WORK_ORDER", label: "Work Order" },
+  { key: "OFF_ESN", label: "Off Engine Serial" },
+  { key: "FOR_ESN", label: "For Engine Serial" },
+  { key: "TASK_DESC", label: "Description" },
+  { key: "TASK_STATUS", label: "Status" },
+  { key: "EMPLOYEE_NAME", label: "Assignee" },
+  { key: "TOLL_GATE", label: "Supervisor Notes" },
+  { key: "WORK_CENTER", label: "Work Center" },
+  { key: "HOURS_WORKED", label: "Hours Clocked" },
+  { key: "SEQUENCE", label: "Sequence" },
 ];
-
-function getAssignee(task) {
-  return [task.assigned, task.assigned_2].filter(Boolean).join(", ");
-}
 
 const MyOrders = () => {
   const navigate = useNavigate();
-  const [sortBy, setSortBy] = useState("priority");
+  const [orders, setOrders] = useState<Record<string, any>[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState("SEQUENCE");
   const [sortOrder, setSortOrder] = useState("asc");
-  const [modalTask, setModalTask] = useState(null);
+  const [modalTask, setModalTask] = useState<Record<string, any> | null>(null);
 
   // Example last updated date (could be dynamic in the future)
   const lastUpdated = new Date().toLocaleString();
 
+  useEffect(() => {
+    setLoading(true);
+    fetchWorkOrders({
+      page: 1,
+      pageSize: 10,
+      "work_order[gte]": "WEN101008",
+      "work_order[like]": "WEN%",
+      "off_esn[notnull]": "",
+      "for_esn[notnull]": "",
+      "toll_gate[notnull]": "",
+      "hours_worked[notnull]": "",
+    } as any)
+      .then((res) => setOrders(res.data))
+      .catch(() => setError("Failed to load work orders"))
+      .finally(() => setLoading(false));
+  }, []);
+
   // Sorting logic
-  const sortedTasks = [...dailyTasksData].sort((a, b) => {
-    let aValue = sortBy === "assignee" ? getAssignee(a) : a[sortBy];
-    let bValue = sortBy === "assignee" ? getAssignee(b) : b[sortBy];
-    if (typeof aValue === "string") aValue = aValue.toLowerCase();
-    if (typeof bValue === "string") bValue = bValue.toLowerCase();
-    if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
-    if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+  const sortedOrders = [...orders].sort((a, b) => {
+    const aValue = a[sortBy];
+    const bValue = b[sortBy];
+    if (typeof aValue === "string" && typeof bValue === "string") {
+      return sortOrder === "asc"
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
+    }
+    if (typeof aValue === "number" && typeof bValue === "number") {
+      return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
+    }
     return 0;
   });
 
-  const handleSort = (key) => {
+  const handleSort = (key: string) => {
     if (sortBy === key) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
@@ -121,13 +78,29 @@ const MyOrders = () => {
     }
   };
 
-  const handleRowClick = (task) => {
-    navigate(`/work-order/${task.work_order}`, {
-      state: {
-        assignees: [task.assigned, task.assigned_2].filter(Boolean),
-      },
-    });
+  const handleRowClick = (order: any) => {
+    navigate(`/work-order/${order.WORK_ORDER}`);
   };
+
+  if (loading) {
+    return (
+      <AppShell>
+        <div className="flex items-center justify-center h-full">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </AppShell>
+    );
+  }
+
+  if (error) {
+    return (
+      <AppShell>
+        <div className="flex items-center justify-center h-full">
+          <div className="text-destructive">{error}</div>
+        </div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell>
@@ -169,53 +142,22 @@ const MyOrders = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedTasks.map((task, idx) => (
+                {sortedOrders.map((order, idx) => (
                   <TableRow
-                    key={idx}
+                    key={order.WORK_ORDER + idx}
                     className="hover:bg-brand-blue/10 cursor-pointer transition-colors border-b border-brand-blue"
-                    onClick={() => handleRowClick(task)}
+                    onClick={() => handleRowClick(order)}
                   >
-                    <TableCell>{task.priority}</TableCell>
-                    <TableCell>{task.work_order}</TableCell>
-                    <TableCell>
-                      {task.off_esn && (
-                        <span
-                          className="text-blue-600 underline cursor-pointer hover:text-blue-800"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/engine/${task.off_esn}`);
-                          }}
-                        >
-                          {task.off_esn}
-                        </span>
-                      )}
-                      {task.off_esn && task.for_esn && <span> → </span>}
-                      {task.for_esn && (
-                        <span
-                          className="text-blue-600 underline cursor-pointer hover:text-blue-800"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/engine/${task.for_esn}`);
-                          }}
-                        >
-                          {task.for_esn}
-                        </span>
-                      )}
-                      {!(task.off_esn || task.for_esn) && "-"}
-                    </TableCell>
-                    <TableCell>{task.description}</TableCell>
-                    <TableCell>{task.task}</TableCell>
-                    <TableCell>{getAssignee(task)}</TableCell>
-                    <TableCell>{task.supervisor_notes}</TableCell>
-                    <TableCell>{task.work_center}</TableCell>
-                    <TableCell>{task.goal}</TableCell>
-                    <TableCell>{task.hours_clocked}</TableCell>
-                    <TableCell>{task.next_sequence}</TableCell>
+                    {columns.map((col) => (
+                      <TableCell key={col.key}>
+                        {order[col.key] ?? "-"}
+                      </TableCell>
+                    ))}
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-            {/* Modal for row details */}
+            {/* Modal for row details (optional, can be adapted for WorkOrder) */}
             {modalTask && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
                 <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-6 w-full max-w-lg relative">
@@ -225,16 +167,17 @@ const MyOrders = () => {
                   >
                     ×
                   </button>
-                  <h3 className="text-xl font-bold mb-4">Task Details</h3>
+                  <h3 className="text-xl font-bold mb-4">Order Details</h3>
                   <div className="space-y-2">
-                    {Object.entries(modalTask).map(([key, value]) => (
-                      <div key={key}>
-                        <span className="font-semibold capitalize">
-                          {key.replace(/_/g, " ")}:
-                        </span>{" "}
-                        {String(value)}
-                      </div>
-                    ))}
+                    {modalTask &&
+                      Object.entries(modalTask).map(([key, value]) => (
+                        <div key={key}>
+                          <span className="font-semibold capitalize">
+                            {key.replace(/_/g, " ")}:
+                          </span>
+                          {String(value)}
+                        </div>
+                      ))}
                   </div>
                 </div>
               </div>
