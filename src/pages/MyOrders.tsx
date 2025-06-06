@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,109 +10,146 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-const dailyTasksData = [
-  {
-    priority: 1,
-    work_order: "WEN101201-2",
-    description: "CORE MAJOR MODULE",
-    task: "DISSASSEMBLE AS REQUIRE",
-    assigned: "Tomas",
-    assigned_2: "Sahan",
-    supervisor_notes: "Certified and sent to final",
-    work_center: "56-30-STP",
-    goal: "CERT BY 1-MAY",
-    hours_clocked: 16.4,
-    next_sequence: 1250,
-    off_esn: "ESN12345",
-    for_esn: "ESN67890",
-  },
-  {
-    priority: 5,
-    work_order: "WEN101201-2",
-    description: "CORE MAJOR MODULE",
-    task: "DISSASSEMBLE AS REQUIRE",
-    assigned: "Tomas",
-    assigned_2: "Sahan",
-    supervisor_notes: "Certified and sent to final",
-    work_center: "56-30-STP",
-    goal: "CERT BY 1-MAY",
-    hours_clocked: 16.4,
-    next_sequence: 1250,
-    off_esn: "ESN12345",
-    for_esn: "ESN67890",
-  },
-  {
-    priority: 10,
-    work_order: "WEN101201-2",
-    description: "COMPRESSOR ROTOR ASSEMBLY",
-    task: "DISSASSEMBLE AS REQUIRE",
-    assigned: "David",
-    assigned_2: "Mabrouka",
-    supervisor_notes: "Certified and sent to final",
-    work_center: "56-30-STP",
-    goal: "CERT BY 1-MAY",
-    hours_clocked: 16.4,
-    next_sequence: 1250,
-    off_esn: "ESN54321",
-    for_esn: "ESN09876",
-  },
-  {
-    priority: 10,
-    work_order: "WEN101201-2-8",
-    description: "CORE MAJOR MODULE",
-    task: "DISSASSEMBLE AS REQUIRE",
-    assigned: "David",
-    assigned_2: "Mabrouka",
-    supervisor_notes: "Certified and sent to final",
-    work_center: "56-30-STP",
-    goal: "CERT BY 1-MAY",
-    hours_clocked: 16.4,
-    next_sequence: 1250,
-    off_esn: "ESN54321",
-    for_esn: "ESN09876",
-  },
-];
+import { fetchWorkOrders, WorkOrder } from "@/services/workOrderService";
 
 const columns = [
-  { key: "priority", label: "Priority" },
-  { key: "work_order", label: "Work Order" },
-  { key: "esn", label: "Engine (OFF_ESN → FOR_ESN)" },
-  { key: "description", label: "Description" },
-  { key: "task", label: "Task" },
-  { key: "assignee", label: "Assignee" },
-  { key: "supervisor_notes", label: "Supervisor Notes" },
-  { key: "work_center", label: "Work Center" },
-  { key: "goal", label: "Goal" },
-  { key: "hours_clocked", label: "Hours Clocked" },
-  { key: "next_sequence", label: "Next Sequence" },
+  { key: "WORK_ORDER", label: "Work Order" },
+  { key: "OFF_ESN", label: "Off Engine Serial" },
+  { key: "FOR_ESN", label: "For Engine Serial" },
+  { key: "TASK_DESC", label: "Description" },
+  { key: "TASK_STATUS", label: "Status" },
+  { key: "EMPLOYEE_NAME", label: "Assignee" },
+  { key: "TOLL_GATE", label: "Supervisor Notes" },
+  { key: "WORK_CENTER", label: "Work Center" },
+  { key: "HOURS_WORKED", label: "Hours Clocked" },
+  { key: "SEQUENCE", label: "Sequence" },
 ];
 
-function getAssignee(task) {
-  return [task.assigned, task.assigned_2].filter(Boolean).join(", ");
-}
+const getStatusColor = (status: string) => {
+  // Green - Completed/Closed statuses
+  const greenStatuses = [
+    "CLOSED",
+    "PERMANENT CLOSE",
+    "SIGNED OFF",
+    "PART SCRAPPED",
+    "PART US",
+    "PICKED UP",
+  ];
+
+  // Red - On Hold statuses
+  const redStatuses = [
+    "ON-HOLD-CMR",
+    "ON-HOLD-ENG",
+    "ON-HOLD-EQUIP",
+    "ON-HOLD-ESR",
+    "ON-HOLD-LAB",
+    "ON-HOLD-MATL",
+    "ON-HOLD-MRB",
+    "ON-HOLD-PLNG",
+    "ON-HOLD-QTN",
+    "ON-HOLD-QUOTE",
+    "ON-HOLD-RCDS",
+    "ON-HOLD-SNAG",
+    "ON-HOLD-TOOL",
+    "ON-HOLD-UPGRADE",
+    "ON-HOLD-WCD",
+    "CANCELED",
+    "TASK REJECT",
+    "WO DOWNGRADE",
+    "WO UPGRADE",
+  ];
+
+  if (greenStatuses.includes(status)) {
+    return "bg-green-500 text-white";
+  } else if (redStatuses.includes(status)) {
+    return "bg-red-500 text-white";
+  } else {
+    // Yellow - In Progress statuses
+    return "bg-yellow-500 text-white";
+  }
+};
 
 const MyOrders = () => {
   const navigate = useNavigate();
-  const [sortBy, setSortBy] = useState("priority");
+  const [orders, setOrders] = useState<WorkOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState("SEQUENCE");
   const [sortOrder, setSortOrder] = useState("asc");
-  const [modalTask, setModalTask] = useState(null);
+  const [modalTask, setModalTask] = useState<WorkOrder | null>(null);
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
 
   // Example last updated date (could be dynamic in the future)
   const lastUpdated = new Date().toLocaleString();
 
+  useEffect(() => {
+    setLoading(true);
+    fetchWorkOrders({
+      page,
+      pageSize: 10,
+      "work_order[gte]": "WEN101008",
+      "work_order[like]": "WEN%",
+      "off_esn[notnull]": "",
+      "for_esn[notnull]": "",
+      "toll_gate[notnull]": "",
+      "hours_worked[notnull]": "",
+    })
+      .then((res) => {
+        // Map the table fields to WorkOrder interface fields
+        const mappedOrders = res.data.map(
+          (
+            order: WorkOrder & {
+              OFF_ESN?: string;
+              FOR_ESN?: string;
+              TASK_DESC?: string;
+              TASK_STATUS?: string;
+              TOLL_GATE?: string;
+              WORK_CENTER?: string;
+              HOURS_WORKED?: number;
+              SEQUENCE?: number;
+            }
+          ) => ({
+            ...order,
+            offEngineSerial: order.OFF_ESN,
+            forEngineSerial: order.FOR_ESN,
+            taskModule: order.TASK_DESC || order.taskModule,
+            taskStatus: order.TASK_STATUS || order.taskStatus,
+            tollGate: order.TOLL_GATE || order.tollGate,
+            workCenterId: order.WORK_CENTER || order.workCenterId,
+            hoursWorked: order.HOURS_WORKED || order.hoursWorked,
+            sequence: order.SEQUENCE || order.sequence,
+          })
+        );
+        setOrders(mappedOrders);
+      })
+      .catch(() => setError("Failed to load work orders"))
+      .finally(() => setLoading(false));
+  }, [page]);
+
   // Sorting logic
-  const sortedTasks = [...dailyTasksData].sort((a, b) => {
-    let aValue = sortBy === "assignee" ? getAssignee(a) : a[sortBy];
-    let bValue = sortBy === "assignee" ? getAssignee(b) : b[sortBy];
-    if (typeof aValue === "string") aValue = aValue.toLowerCase();
-    if (typeof bValue === "string") bValue = bValue.toLowerCase();
-    if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
-    if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+  const sortedOrders = [...orders].sort((a, b) => {
+    const aValue = a[sortBy];
+    const bValue = b[sortBy];
+    if (typeof aValue === "string" && typeof bValue === "string") {
+      return sortOrder === "asc"
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
+    }
+    if (typeof aValue === "number" && typeof bValue === "number") {
+      return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
+    }
     return 0;
   });
 
-  const handleSort = (key) => {
+  // Filter orders by search string (workOrder, EMPLOYEE_NAME, TASK_DESC)
+  const filteredOrders = sortedOrders.filter((order) =>
+    [order.workOrder, order.EMPLOYEE_NAME, order.TASK_DESC].some((field) =>
+      field?.toLowerCase().includes(search.toLowerCase())
+    )
+  );
+
+  const handleSort = (key: string) => {
     if (sortBy === key) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
@@ -121,13 +158,31 @@ const MyOrders = () => {
     }
   };
 
-  const handleRowClick = (task) => {
-    navigate(`/work-order/${task.work_order}`, {
-      state: {
-        assignees: [task.assigned, task.assigned_2].filter(Boolean),
-      },
+  const handleRowClick = (order: WorkOrder) => {
+    navigate(`/work-order/${order.workOrderId}`, {
+      state: { workOrder: order },
     });
   };
+
+  if (loading) {
+    return (
+      <AppShell>
+        <div className="flex items-center justify-center h-full">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </AppShell>
+    );
+  }
+
+  if (error) {
+    return (
+      <AppShell>
+        <div className="flex items-center justify-center h-full">
+          <div className="text-destructive">{error}</div>
+        </div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell>
@@ -144,6 +199,13 @@ const MyOrders = () => {
             <CardTitle>Orders</CardTitle>
           </CardHeader>
           <CardContent>
+            <input
+              type="text"
+              placeholder="Search orders..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="mb-4 px-3 py-2 border rounded w-full max-w-xs"
+            />
             <Table>
               <TableHeader>
                 <TableRow className="bg-brand-navy text-white font-semibold border-b border-brand-blue">
@@ -169,53 +231,49 @@ const MyOrders = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedTasks.map((task, idx) => (
+                {filteredOrders.map((order, idx) => (
                   <TableRow
-                    key={idx}
+                    key={order.workOrder + idx}
                     className="hover:bg-brand-blue/10 cursor-pointer transition-colors border-b border-brand-blue"
-                    onClick={() => handleRowClick(task)}
+                    onClick={() => handleRowClick(order)}
                   >
-                    <TableCell>{task.priority}</TableCell>
-                    <TableCell>{task.work_order}</TableCell>
-                    <TableCell>
-                      {task.off_esn && (
-                        <span
-                          className="text-blue-600 underline cursor-pointer hover:text-blue-800"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/engine/${task.off_esn}`);
-                          }}
-                        >
-                          {task.off_esn}
-                        </span>
-                      )}
-                      {task.off_esn && task.for_esn && <span> → </span>}
-                      {task.for_esn && (
-                        <span
-                          className="text-blue-600 underline cursor-pointer hover:text-blue-800"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/engine/${task.for_esn}`);
-                          }}
-                        >
-                          {task.for_esn}
-                        </span>
-                      )}
-                      {!(task.off_esn || task.for_esn) && "-"}
-                    </TableCell>
-                    <TableCell>{task.description}</TableCell>
-                    <TableCell>{task.task}</TableCell>
-                    <TableCell>{getAssignee(task)}</TableCell>
-                    <TableCell>{task.supervisor_notes}</TableCell>
-                    <TableCell>{task.work_center}</TableCell>
-                    <TableCell>{task.goal}</TableCell>
-                    <TableCell>{task.hours_clocked}</TableCell>
-                    <TableCell>{task.next_sequence}</TableCell>
+                    {columns.map((col) => (
+                      <TableCell key={col.key}>
+                        {col.key === "TASK_STATUS" ? (
+                          <span
+                            className={`inline-block px-2 py-1 rounded-full text-xs font-semibold text-center whitespace-nowrap ${getStatusColor(
+                              order[col.key]
+                            )}`}
+                          >
+                            {order[col.key] ?? "-"}
+                          </span>
+                        ) : (
+                          order[col.key] ?? "-"
+                        )}
+                      </TableCell>
+                    ))}
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-            {/* Modal for row details */}
+            <div className="flex justify-between mt-4">
+              <button
+                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+              >
+                Previous
+              </button>
+              <span>Page {page}</span>
+              <button
+                className="px-4 py-2 bg-gray-200 rounded"
+                onClick={() => setPage((p) => p + 1)}
+                disabled={orders.length < 10}
+              >
+                Next
+              </button>
+            </div>
+            {/* Modal for row details (optional, can be adapted for WorkOrder) */}
             {modalTask && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
                 <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-6 w-full max-w-lg relative">
@@ -225,16 +283,17 @@ const MyOrders = () => {
                   >
                     ×
                   </button>
-                  <h3 className="text-xl font-bold mb-4">Task Details</h3>
+                  <h3 className="text-xl font-bold mb-4">Order Details</h3>
                   <div className="space-y-2">
-                    {Object.entries(modalTask).map(([key, value]) => (
-                      <div key={key}>
-                        <span className="font-semibold capitalize">
-                          {key.replace(/_/g, " ")}:
-                        </span>{" "}
-                        {String(value)}
-                      </div>
-                    ))}
+                    {modalTask &&
+                      Object.entries(modalTask).map(([key, value]) => (
+                        <div key={key}>
+                          <span className="font-semibold capitalize">
+                            {key.replace(/_/g, " ")}:
+                          </span>
+                          {String(value)}
+                        </div>
+                      ))}
                   </div>
                 </div>
               </div>
