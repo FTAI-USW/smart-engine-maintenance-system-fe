@@ -18,6 +18,14 @@ export interface WorkOrder {
   hoursWorked: number;
   clockIn: string;
   clockOff: string;
+  EMPLOYEE_NAME?: string;
+  TASK_DESC?: string;
+  TOLL_GATE?: string;
+  WORK_CENTER?: string;
+  HOURS_WORKED?: number;
+  SEQUENCE?: number;
+  OFF_ESN?: string;
+  FOR_ESN?: string;
 }
 
 export interface WorkOrderResponse {
@@ -33,6 +41,7 @@ export interface WorkOrderResponse {
 }
 
 export interface WorkOrderFilters {
+  [key: string]: string | number | boolean | undefined;
   workOrder?: string;
   esnId?: string;
   taskStatus?: string;

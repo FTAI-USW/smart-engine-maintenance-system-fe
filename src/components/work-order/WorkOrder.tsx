@@ -4,14 +4,11 @@ import { ChevronRight } from "lucide-react";
 import Timeline from "@/components/work-order/timeline/Timeline";
 import TimelineSidePanel from "./timeline/TimelineSidePanel";
 import type { Task } from "./timeline/TimelineSidePanel";
-import { useState, useEffect } from "react";
-import {
-  fetchWorkOrderById,
-  type WorkOrder,
-} from "@/services/workOrderService";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import type { WorkOrder } from "@/services/workOrderService";
 
 const HEADER_OFFSET = 180;
 
@@ -22,44 +19,14 @@ const WorkOrder = () => {
   const availableHeight = window.innerHeight - HEADER_OFFSET;
   const [sidePanelTech, setSidePanelTech] = useState<string | null>(null);
   const [allTasks, setAllTasks] = useState<Task[]>([]);
-  const [workOrder, setWorkOrder] = useState<WorkOrder | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // Use workOrder from navigation state
+  const workOrder = location.state?.workOrder as WorkOrder | undefined;
 
-  useEffect(() => {
-    const fetchWorkOrder = async () => {
-      if (!workOrderId) return;
-
-      try {
-        setLoading(true);
-        const data = await fetchWorkOrderById(workOrderId);
-        setWorkOrder(data);
-      } catch (err) {
-        setError("Failed to load work order details");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchWorkOrder();
-  }, [workOrderId]);
-
-  if (loading) {
+  if (!workOrder) {
     return (
       <AppShell>
         <div className="flex items-center justify-center h-full">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div>
-      </AppShell>
-    );
-  }
-
-  if (error) {
-    return (
-      <AppShell>
-        <div className="flex items-center justify-center h-full">
-          <div className="text-destructive">{error}</div>
+          <div className="text-destructive">No work order data provided.</div>
         </div>
       </AppShell>
     );
@@ -80,19 +47,19 @@ const WorkOrder = () => {
             <span className="text-foreground">Work Order {workOrderId}</span>
           </div>
           <h2 className="text-3xl font-bold tracking-tight">
-            Work Order {workOrder?.workOrder}
+            Work Order {workOrder.workOrder}
           </h2>
           <div className="flex items-center gap-2 mt-2">
             <Badge
               variant={
-                workOrder?.taskStatus === "Completed" ? "secondary" : "default"
+                workOrder.taskStatus === "Completed" ? "secondary" : "default"
               }
             >
-              {workOrder?.taskStatus}
+              {workOrder.taskStatus}
             </Badge>
             <span className="text-muted-foreground">
               Created{" "}
-              {workOrder?.createdDate &&
+              {workOrder.createdDate &&
                 format(new Date(workOrder.createdDate), "PPP")}
             </span>
           </div>
@@ -109,19 +76,19 @@ const WorkOrder = () => {
               <dl className="space-y-2">
                 <div>
                   <dt className="text-sm text-muted-foreground">ESN ID</dt>
-                  <dd className="font-medium">{workOrder?.esnId}</dd>
+                  <dd className="font-medium">{workOrder.esnId}</dd>
                 </div>
                 <div>
                   <dt className="text-sm text-muted-foreground">
                     Off Engine Serial
                   </dt>
-                  <dd className="font-medium">{workOrder?.offEngineSerial}</dd>
+                  <dd className="font-medium">{workOrder.offEngineSerial}</dd>
                 </div>
                 <div>
                   <dt className="text-sm text-muted-foreground">
                     For Engine Serial
                   </dt>
-                  <dd className="font-medium">{workOrder?.forEngineSerial}</dd>
+                  <dd className="font-medium">{workOrder.forEngineSerial}</dd>
                 </div>
               </dl>
             </CardContent>
@@ -137,17 +104,17 @@ const WorkOrder = () => {
               <dl className="space-y-2">
                 <div>
                   <dt className="text-sm text-muted-foreground">Module</dt>
-                  <dd className="font-medium">{workOrder?.taskModule}</dd>
+                  <dd className="font-medium">{workOrder.taskModule}</dd>
                 </div>
                 <div>
                   <dt className="text-sm text-muted-foreground">Sequence</dt>
-                  <dd className="font-medium">{workOrder?.sequence}</dd>
+                  <dd className="font-medium">{workOrder.sequence}</dd>
                 </div>
                 <div>
                   <dt className="text-sm text-muted-foreground">
                     Estimated Hours
                   </dt>
-                  <dd className="font-medium">{workOrder?.estimatedHours}</dd>
+                  <dd className="font-medium">{workOrder.estimatedHours}</dd>
                 </div>
               </dl>
             </CardContent>
@@ -165,19 +132,19 @@ const WorkOrder = () => {
                   <dt className="text-sm text-muted-foreground">
                     Hours Worked
                   </dt>
-                  <dd className="font-medium">{workOrder?.hoursWorked || 0}</dd>
+                  <dd className="font-medium">{workOrder.hoursWorked || 0}</dd>
                 </div>
                 <div>
                   <dt className="text-sm text-muted-foreground">Clock In</dt>
                   <dd className="font-medium">
-                    {workOrder?.clockIn &&
+                    {workOrder.clockIn &&
                       format(new Date(workOrder.clockIn), "PPp")}
                   </dd>
                 </div>
                 <div>
                   <dt className="text-sm text-muted-foreground">Clock Off</dt>
                   <dd className="font-medium">
-                    {workOrder?.clockOff &&
+                    {workOrder.clockOff &&
                       format(new Date(workOrder.clockOff), "PPp")}
                   </dd>
                 </div>
