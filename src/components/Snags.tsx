@@ -83,7 +83,7 @@ const Snags = () => {
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Snags</h2>
-          <p className="text-muted-foreground">Work in progress</p>
+          <p className="text-muted-foreground">Work blockers</p>
           <p className="text-xs text-muted-foreground mt-1">
             Last updated: {lastUpdated}
           </p>
@@ -149,14 +149,14 @@ const Snags = () => {
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-brand-navy text-white font-semibold border-b border-brand-blue">
-                      <TableHead className="text-white min-w-[140px] w-1/6">Work Order</TableHead>
-                      {/* <TableHead className="text-white min-w-[160px] w-2/5">Description</TableHead> */}
-                      <TableHead className="text-white min-w-[140px] w-1/6">Status</TableHead>
-                      <TableHead className="text-white min-w-[100px] w-1/12">Module</TableHead>
-                      <TableHead className="text-white min-w-[160px] w-1/6">Engineering Required</TableHead>
-                      <TableHead className="text-white min-w-[180px] w-1/4">Created Date</TableHead>
-                      <TableHead className="text-white min-w-[44px] w-1/12 text-center"></TableHead>
+                    <TableRow className="bg-brand-navy text-white font-semibold border-b border-brand-blue sticky top-0 z-10">
+                      <TableHead className="text-white min-w-[140px] w-1/6 bg-brand-navy">Work Order</TableHead>
+                      {/* <TableHead className="text-white min-w-[160px] w-2/5 bg-brand-navy">Description</TableHead> */}
+                      <TableHead className="text-white min-w-[140px] w-1/6 bg-brand-navy">Status</TableHead>
+                      <TableHead className="text-white min-w-[100px] w-1/12 bg-brand-navy">Module</TableHead>
+                      <TableHead className="text-white min-w-[160px] w-1/6 bg-brand-navy">Engineering Required</TableHead>
+                      <TableHead className="text-white min-w-[180px] w-1/4 bg-brand-navy">Created Date</TableHead>
+                      <TableHead className="text-white min-w-[44px] w-1/12 text-center bg-brand-navy"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -221,8 +221,8 @@ const Snags = () => {
         </Card>
       </div>
       {selectedSnag && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40" onClick={() => setSelectedSnag(null)}>
+          <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative" onClick={e => e.stopPropagation()}>
             <button
               className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
               onClick={() => setSelectedSnag(null)}
